@@ -1,9 +1,12 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 
 import {
   ColorBox,
+  CondensedCaption,
   LegendContainer,
   LegendItemHeader,
   LegendItemContainer,
@@ -12,14 +15,49 @@ import {
 
 export function Legend(props) {
   return (
-    <LegendContainer container spacing={1} direction="row" {...props}>
-      {props.children}
-    </LegendContainer>
+    <>
+      <LegendContainer item container spacing={1} direction="row" {...props}>
+        {React.Children.map(props.children, child =>
+          React.cloneElement(child, { condensed: props.condensed }),
+        )}
+      </LegendContainer>
+      {props.condensed && (
+        <CondensedCaption
+          variant="caption"
+          color="inherit"
+          style={{ padding: '0 calc(1rem + 8px)' }}
+        >
+          Hover to learn more
+        </CondensedCaption>
+      )}
+    </>
   );
 }
 
+const CustomTooltip = withStyles(theme => ({
+  tooltip: {
+    fontSize: theme.typography.pxToRem(13),
+    maxWidth: 250,
+  },
+}))(Tooltip);
+
 export function LegendItem(props) {
-  const { title, color, description } = props;
+  const { title, color, description, condensed } = props;
+  if (condensed) {
+    return (
+      <Grid item xs="4" md="4">
+        <CustomTooltip arrow title={description}>
+          <LegendItemContainer>
+            <LegendItemHeader condensed>
+              <ColorBox color={color} />
+              <Typography variant="body2">{title}</Typography>
+            </LegendItemHeader>
+          </LegendItemContainer>
+        </CustomTooltip>
+      </Grid>
+    );
+  }
+
   return (
     <Grid item xs="12" md="4">
       <LegendItemContainer>

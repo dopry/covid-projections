@@ -3,6 +3,7 @@ import { useHistory, useLocation, matchPath, Link } from 'react-router-dom';
 import { ArrowBack } from '@material-ui/icons';
 import Typography from '@material-ui/core/Typography';
 import Logo from 'assets/images/logo';
+import { useIsEmbed } from 'utils/hooks';
 import MobileMenu from './MobileMenu';
 import Burger from './Burger';
 import {
@@ -34,13 +35,18 @@ const _AppBar = () => {
   const [open, setOpen] = useState(false);
 
   const locationPath = useLocation();
+
+  const isEmbed = useIsEmbed();
+
+  // Don't show in iFrame
+  if (isEmbed) return null;
+
   const match = matchPath(locationPath.pathname, {
     path: '/state/:id',
     exact: true,
     strict: false,
   });
   const locationName = match && match.params ? STATES[match.params.id] : '';
-
   const goTo = route => e => {
     e.preventDefault();
     setOpen(false);
