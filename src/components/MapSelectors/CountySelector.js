@@ -76,14 +76,11 @@ const CountySelector = ({
   ],
   selectedCounty,
   setSelectedCounty,
+  autoFocus = false,
 }) => {
   let options = US_STATE_DATASET.state_county_map_dataset[state].county_dataset;
   const COUNTY_FIELD = 'county';
 
-  // options.map((option, index) => {
-  //   options[index]['value'] = option.county;
-  // });
-  //
   each(dataset, item => {
     const county = find(options, {
       county: item[COUNTY_FIELD],
@@ -99,26 +96,6 @@ const CountySelector = ({
   });
 
   const sortedOptions = sortBy(options, ['population', 'hasData']).reverse();
-
-  const handleSelectChange = option => {
-    console.log('change', option);
-
-    if (!option) {
-      return;
-    }
-
-    return handleChange(option);
-  };
-
-  const isOptionSelected = option => {
-    if (!selectedCounty) {
-      console.log('not selected');
-      return false;
-    }
-    console.log('selected');
-
-    return isEqual(option, selectedCounty);
-  };
 
   const handleCustomFilter = (option, searchInput) => {
     const words = searchInput.split(' ');
@@ -137,7 +114,9 @@ const CountySelector = ({
 
   return (
     <Select
-      onChange={handleSelectChange}
+      defaultValue={selectedCounty}
+      placeholder="Select a county"
+      options={sortedOptions}
       components={{
         SingleValue,
         NoOptionsMessage,
@@ -148,14 +127,13 @@ const CountySelector = ({
       }}
       name="county"
       isClearable={true}
-      placeholder="Select a county"
-      isOptionSelected={isOptionSelected}
       styles={CustomStyles}
       filterOption={handleCustomFilter}
       getOptionLabel={option => option}
       getOptionValue={option => option}
       isSearchable={true}
-      options={sortedOptions}
+      autoFocus={autoFocus}
+      onChange={handleChange}
     />
   );
 };
