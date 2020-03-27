@@ -44,6 +44,8 @@ function ModelPage() {
   console.log('modelDatasMap', modelDatasMap, selectedCounty);
 
   const locationName = STATES[location];
+  const countyName = selectedCounty ? selectedCounty.county : null;
+
   const intervention = STATE_TO_INTERVENTION[location];
   const showModel = !countyView || (countyView && selectedCounty);
 
@@ -58,55 +60,60 @@ function ModelPage() {
     (!countyView && !modelDatas) ||
     (countyView && selectedCounty && !modelDatas)
   ) {
-    return <Header locationName={locationName} intervention={intervention} />;
+    return (
+      <Header
+        locationName={locationName}
+        countyName={countyName}
+        intervention={intervention}
+      />
+    );
   }
 
   return (
     <Wrapper>
-      <Header locationName={locationName} intervention={intervention} />
-      <CountySelectorWrapper>
-        <ModelViewToggle>
-          <ModelViewOption
-            selected={!countyView}
-            onClick={() => {
-              setCountyView(false);
-              setSelectedCounty(null);
-            }}
-          >
-            State View
-          </ModelViewOption>
-          <ModelViewOption
-            selected={countyView}
-            onClick={() => setCountyView(true)}
-          >
-            County View
-          </ModelViewOption>
-        </ModelViewToggle>
-        {countyView && (
-          <CountySelector
-            state={location}
-            selectedCounty={selectedCounty}
-            setSelectedCounty={setSelectedCounty}
-            handleChange={selected =>
-              setSelectedCounty({ county: selected.county })
-            }
-          />
-        )}
-      </CountySelectorWrapper>
-      {showModel && interventions && (
-        <Panel>
-          <ChartHeader>
-            <h2>Projected hospitalizations</h2>
-            <span>Last updated March 23rd</span>
-          </ChartHeader>
-          <Chart
-            state={locationName}
-            county={selectedCounty}
-            subtitle="Hospitalizations over time"
-            interventions={interventions}
-            currentIntervention={intervention}
-            dateOverwhelmed={interventions.baseline.dateOverwhelmed}
-          />
+      <Header
+        locationName={locationName}
+        countyName={countyName}
+        intervention={intervention}
+      />
+      <Content>
+        <CountySelectorWrapper>
+          <ModelViewToggle>
+            <ModelViewOption
+              selected={!countyView}
+              onClick={() => {
+                setCountyView(false);
+                setSelectedCounty(null);
+              }}
+            >
+              State View
+            </ModelViewOption>
+            <ModelViewOption
+              selected={countyView}
+              onClick={() => setCountyView(true)}
+            >
+              County View
+            </ModelViewOption>
+          </ModelViewToggle>
+          {countyView && (
+            <CountySelector
+              state={location}
+              selectedCounty={selectedCounty}
+              handleChange={option => setSelectedCounty(option)}
+              autoFocus
+            />
+          )}
+        </CountySelectorWrapper>
+        {showModel && interventions && (
+          <>
+            <Chart
+              state={locationName}
+              county={selectedCounty}
+              subtitle="Hospitalizations over time"
+              interventions={interventions}
+              currentIntervention={intervention}
+              dateOverwhelmed={interventions.baseline.dateOverwhelmed}
+            />
 
           <Content>
             <CallToAction
