@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Highcharts, { dateFormat } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/css/highcharts.css';
@@ -46,7 +46,8 @@ const Chart = ({
     data: data[0].data,
   };
   const socialDistancing = {
-    name: currentIntervention === INTERVENTIONS.SHELTER_IN_PLACE
+    name:
+      currentIntervention === INTERVENTIONS.SHELTER_IN_PLACE
         ? formatIntervention(INTERVENTIONS.SHELTER_IN_PLACE, ' (worst case)')
         : formatIntervention(INTERVENTIONS.SOCIAL_DISTANCING),
     type: 'area',
@@ -72,7 +73,7 @@ const Chart = ({
     data: data[4].data,
   };
 
-  const [options] = useState({
+  const chartOptions = {
     chart: {
       styledMode: true,
       height: '600',
@@ -148,7 +149,12 @@ const Chart = ({
       wuhanStyle,
       availableBeds,
     ],
-  });
+  };
+  const [options, setOptions] = useState(chartOptions);
+
+  useEffect(() => {
+    setOptions(chartOptions);
+  }, [county]);
 
   return (
     <Wrapper

@@ -1,17 +1,17 @@
 import { find, each, sortBy, some, isEqual } from 'lodash';
-import React, { useState }                   from 'react';
-import Select, { components }                from 'react-select';
-import BaseValueContainer                    from './BaseValueContainer';
-import CustomStyles                          from './CustomStyles';
-import US_STATE_DATASET                      from './datasets/us_states_dataset_01_02_2020';
+import React, { useState } from 'react';
+import Select, { components } from 'react-select';
+import BaseValueContainer from './BaseValueContainer';
+import CustomStyles from './CustomStyles';
+import US_STATE_DATASET from './datasets/us_states_dataset_01_02_2020';
 
 import {
   StyledNoResultsMenuOption,
   StyledResultsMenuOption,
   StyledNoOptionsMessage,
-} from './MapSelectors.style'
+} from './MapSelectors.style';
 
-const SingleValue = ({children, ...props}) => {
+const SingleValue = ({ children, ...props }) => {
   return (
     <components.SingleValue {...props}>
       {children.county}
@@ -22,9 +22,7 @@ const SingleValue = ({children, ...props}) => {
 const NoOptionsMessage = props => {
   return (
     <components.NoOptionsMessage {...props}>
-      <StyledNoOptionsMessage>
-        No matching counties
-      </StyledNoOptionsMessage>
+      <StyledNoOptionsMessage>No matching counties</StyledNoOptionsMessage>
     </components.NoOptionsMessage>
   );
 };
@@ -37,10 +35,10 @@ const Option = ({ children, ...props }) => {
           <div>
             <strong>{children.county}</strong>
           </div>
-            {!props.data.hasData && 
-                <span>No data available - </span>
-            } 
-          <span>{new Intl.NumberFormat().format(children.population)} residents</span>
+          {!props.data.hasData && <span>No data available - </span>}
+          <span>
+            {new Intl.NumberFormat().format(children.population)} residents
+          </span>
         </div>
       </StyledResultsMenuOption>
     </components.Option>
@@ -48,10 +46,7 @@ const Option = ({ children, ...props }) => {
 };
 
 const MenuList = ({ children, ...props }) => {
-  const hasCountyDataCount = props
-    .options
-    .filter(opt => opt.hasData)
-    .length;
+  const hasCountyDataCount = props.options.filter(opt => opt.hasData).length;
 
   const hasMatches = Array.isArray(children);
 
@@ -59,11 +54,12 @@ const MenuList = ({ children, ...props }) => {
 
   return (
     <components.MenuList {...props}>
-      { (hasCountyDataCount < countyCount && hasMatches) && 
+      {hasCountyDataCount < countyCount && hasMatches && (
         <StyledNoResultsMenuOption>
-          Data is available for {hasCountyDataCount} of {countyCount} MI counties
+          Data is available for {hasCountyDataCount} of {countyCount} MI
+          counties
         </StyledNoResultsMenuOption>
-      }
+      )}
       {children}
     </components.MenuList>
   );
@@ -73,15 +69,22 @@ const MenuList = ({ children, ...props }) => {
 const CountySelector = ({
   state,
   handleChange,
-  dataset = [{
-    county: 'Wayne County',
-  }],
+  dataset = [
+    {
+      county: 'Wayne County',
+    },
+  ],
+  selectedCounty,
+  setSelectedCounty,
 }) => {
-  const [selectedOption, setSelectedOption] = useState(null);
-  const options = US_STATE_DATASET.state_county_map_dataset[state].county_dataset;
+  let options = US_STATE_DATASET.state_county_map_dataset[state].county_dataset;
   const COUNTY_FIELD = 'county';
 
-  each(dataset, (item) => {
+  // options.map((option, index) => {
+  //   options[index]['value'] = option.county;
+  // });
+  //
+  each(dataset, item => {
     const county = find(options, {
       county: item[COUNTY_FIELD],
     });
@@ -95,12 +98,10 @@ const CountySelector = ({
     });
   });
 
-  const sortedOptions = sortBy(options, ['population', 'hasData'])
-    .reverse();
+  const sortedOptions = sortBy(options, ['population', 'hasData']).reverse();
 
-  const handleSelectChange = (option) => {
+  const handleSelectChange = option => {
     console.log('change', option);
-    setSelectedOption(option);
 
     if (!option) {
       return;
@@ -109,12 +110,14 @@ const CountySelector = ({
     return handleChange(option);
   };
 
-  const isOptionSelected = (option) => {
-    if (!selectedOption) {
+  const isOptionSelected = option => {
+    if (!selectedCounty) {
+      console.log('not selected');
       return false;
     }
+    console.log('selected');
 
-    return isEqual(option, selectedOption);
+    return isEqual(option, selectedCounty);
   };
 
   const handleCustomFilter = (option, searchInput) => {
@@ -122,11 +125,12 @@ const CountySelector = ({
     const lowerCasedCities = option.data.cities.map(city => city.toLowerCase());
 
     return words.reduce(
-      (acc, cur) => acc && 
-      (
-        option.data.county.toLowerCase().includes(cur.toLowerCase())
-        || some(lowerCasedCities, lowerCasedCity => lowerCasedCity.includes(cur.toLowerCase()))
-      ),
+      (acc, cur) =>
+        acc &&
+        (option.data.county.toLowerCase().includes(cur.toLowerCase()) ||
+          some(lowerCasedCities, lowerCasedCity =>
+            lowerCasedCity.includes(cur.toLowerCase()),
+          )),
       true,
     );
   };
@@ -134,7 +138,7 @@ const CountySelector = ({
   return (
     <Select
       onChange={handleSelectChange}
-      components={{ 
+      components={{
         SingleValue,
         NoOptionsMessage,
         Option,

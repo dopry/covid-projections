@@ -7,14 +7,21 @@ import CallToAction from './CallToAction/CallToAction';
 import Header from 'components/Header/Header';
 import Chart from 'components/Chart/Chart';
 import Newsletter from 'components/Newsletter/Newsletter';
-import { Wrapper, Content } from './ModelPage.style';
+import CountySelector from 'components/MapSelectors/CountySelector';
+import {
+  Wrapper,
+  Content,
+  ModelViewOption,
+  ModelViewToggle,
+  CountySelectorWrapper,
+} from './ModelPage.style';
 import {
   STATES,
   STATE_TO_INTERVENTION,
   INTERVENTION_COLOR_MAP,
   INTERVENTIONS,
   SHELTER_IN_PLACE_WORST_CASE_COLOR,
-} from "enums";
+} from 'enums';
 import { useModelDatas, Model } from 'utils/model';
 
 const limitedActionColor = INTERVENTION_COLOR_MAP[INTERVENTIONS.LIMITED_ACTION];
@@ -28,23 +35,27 @@ const shelterInPlaceWorseCaseColor = SHELTER_IN_PLACE_WORST_CASE_COLOR;
 function ModelPage() {
   const { id: location } = useParams();
   const [countyView, setCountyView] = useState(false);
-  const [county, setCounty] = useState(null);
-  // const [modelDatas, setModelDatas] = useState(null);
-  // const [interventions, setInterventions] = useState(null);
+  const [selectedCounty, setSelectedCounty] = useState(null);
   let modelDatas = null;
   let interventions = null;
-  const modelDatasMap = useModelDatas(location, county);
+  const modelDatasMap = useModelDatas(location, selectedCounty);
+  console.log('modelDatasMap', modelDatasMap, selectedCounty);
 
   const locationName = STATES[location];
   const intervention = STATE_TO_INTERVENTION[location];
-  const showModel = !countyView || (countyView && county);
+  const showModel = !countyView || (countyView && selectedCounty);
 
-  const datasForView = countyView ? modelDatasMap.county : modelDatasMap.state;
+  const datasForView = countyView
+    ? modelDatasMap.countyDatas
+    : modelDatasMap.stateDatas;
   modelDatas = datasForView;
   interventions = buildInterventionMap(datasForView);
 
   // No model data
-  if ((!countyView && !modelDatas) || (countyView && county && !modelDatas)) {
+  if (
+    (!countyView && !modelDatas) ||
+    (countyView && selectedCounty && !modelDatas)
+  ) {
     return <Header locationName={locationName} intervention={intervention} />;
   }
 
@@ -52,29 +63,42 @@ function ModelPage() {
     <Wrapper>
       <Header locationName={locationName} intervention={intervention} />
       <Content>
-        {false && (
-          <>
-            <input
-              type="checkbox"
-              checked={countyView}
-              value={countyView}
-              onClick={() => setCountyView(!countyView)}
-            />{' '}
-            Show County View
+        {
+          <CountySelectorWrapper>
+            <ModelViewToggle>
+              <ModelViewOption
+                selected={!countyView}
+                onClick={() => {
+                  setCountyView(false);
+                  setSelectedCounty(null);
+                }}
+              >
+                State View
+              </ModelViewOption>
+              <ModelViewOption
+                selected={countyView}
+                onClick={() => setCountyView(true)}
+              >
+                County View
+              </ModelViewOption>
+            </ModelViewToggle>
             {countyView && (
-              <input
-                type="text"
-                value={county}
-                onChange={e => setCounty({ county: e.target.value })}
+              <CountySelector
+                state={location}
+                selectedCounty={selectedCounty}
+                setSelectedCounty={setSelectedCounty}
+                handleChange={selected =>
+                  setSelectedCounty({ county: selected.county })
+                }
               />
             )}
-          </>
-        )}
+          </CountySelectorWrapper>
+        }
         {showModel && interventions && (
           <>
             <Chart
               state={locationName}
-              county={county}
+              county={selectedCounty}
               subtitle="Hospitalizations over time"
               interventions={interventions}
               currentIntervention={intervention}
