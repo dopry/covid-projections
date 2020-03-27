@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Redirect, useParams } from 'react-router-dom';
+import { Redirect, useParams, useHistory } from 'react-router-dom';
 // import CountyMap from 'components/CountyMap/CountyMap';
 import Outcomes from './Outcomes/Outcomes';
 import ShareModelBlock from './ShareModelBlock/ShareModelBlock';
@@ -40,6 +40,7 @@ function ModelPage() {
   const [countyView, setCountyView] = useState(false);
   const [selectedCounty, setSelectedCounty] = useState(null);
   const [redirectTarget, setRedirectTarget] = useState();
+  const history = useHistory();
 
   let modelDatas = null;
   let interventions = null;
@@ -50,9 +51,6 @@ function ModelPage() {
   const countyName = selectedCounty ? selectedCounty.county : null;
 
   const intervention = STATE_TO_INTERVENTION[location];
-  const showModel =
-    !countyView ||
-    (countyView && selectedCounty && modelDatas && !modelDatas.error);
 
   const datasForView = countyView
     ? modelDatasMap.countyDatas
@@ -60,30 +58,28 @@ function ModelPage() {
 
   modelDatas = datasForView;
 
+  let showModel = !countyView || (countyView && selectedCounty && modelDatas);
+
+  if (modelDatas && modelDatas.error === true) {
+    showModel = false;
+  }
+
   interventions = null;
   if (modelDatas && !modelDatas.error) {
     interventions = buildInterventionMap(datasForView);
   }
 
   if (redirectTarget) {
+    const goToLocation = redirectTarget;
     setRedirectTarget(null);
-    return <Redirect push to={redirectTarget} />;
+    history.push(goToLocation);
   }
-
-  const HeaderWithProps = (
-    <Header
-      locationName={locationName}
-      countyName={countyName}
-      intervention={intervention}
-    />
-  );
 
   // No model data
   if (
     (!countyView && !modelDatas) ||
     (countyView && selectedCounty && !modelDatas)
   ) {
-    console.log('here');
     return (
       <Header
         locationName={locationName}
