@@ -8,13 +8,6 @@ import {
   CheckShelterInPlace,
 } from 'assets/images/capacityIcons';
 
-const LAST_DATES_CALLOUT_COLORS = {
-  // Array is [fill color, border color]
-  [INTERVENTIONS.LIMITED_ACTION]: ['rgba(255, 0, 0, 0.0784)', 'red'],
-  [INTERVENTIONS.SOCIAL_DISTANCING]: ['rgba(255, 255, 0, 0.0784)', 'yellow'],
-  [INTERVENTIONS.SHELTER_IN_PLACE]: ['rgba(0, 255, 0, 0.0784)', 'green'],
-};
-
 const DAYS = 1000 * 60 * 60 * 24;
 const ONE_HUNDRED_DAYS = 100 * DAYS;
 
@@ -56,19 +49,6 @@ const CallToAction = ({ interventions, currentIntervention }) => {
       );
   }
 
-  const [calloutFillColor, calloutStrokeColor] = LAST_DATES_CALLOUT_COLORS[
-    currentIntervention
-  ];
-
-  // return (
-  //   <Callout
-  //     borderColor={calloutStrokeColor}
-  //     backgroundColor={calloutFillColor}
-  //   >
-  //     <div style={{ fontWeight: 'normal' }}>{actionText}</div>
-  //     {actionDateRange}
-  //   </Callout>
-  // );
   const Title = ({ children }) => {
     return (
       <div
@@ -99,58 +79,79 @@ const CallToAction = ({ interventions, currentIntervention }) => {
     <div
       style={{
         marginTop: '2rem',
-        textAlign: 'left',
         border: '1px solid #d5d5d5',
         borderRadius: '4px',
         borderSizing: 'border-box',
         overflow: 'hidden',
+        display: 'flex',
       }}
     >
-      <Title>Hospital capacity</Title>
-      <Content>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div>{capacityIcon}</div>
+      <div
+        style={{
+          borderRight: `1px solid #d5d5d5`,
+          width: '50%',
+        }}
+      >
+        <Title>Hospital capacity</Title>
+        <Content>
           <div
             style={{
-              paddingLeft: '16px',
-              color: '#4d4d4d',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            {shortActionText}
+            <div>{capacityIcon}</div>
+            <div
+              style={{
+                paddingLeft: '16px',
+                color: '#4d4d4d',
+              }}
+            >
+              {shortActionText}
+            </div>
           </div>
-        </div>
-      </Content>
-      <Title>Current Intervention style</Title>
-      <Content>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        </Content>
+      </div>
+      <div style={{ width: '50%' }}>
+        <Title>Current Intervention style</Title>
+        <Content>
           <div
             style={{
-              borderRadius: '9999px',
-              border: '2px solid #4d4d4d',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <div
               style={{
-                width: '20px',
-                height: '20px',
-                background: INTERVENTION_COLOR_MAP[currentIntervention],
                 borderRadius: '9999px',
-                border: '4px solid white',
+                border: '2px solid #4d4d4d',
               }}
             >
-              &nbsp;
+              <div
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  background: INTERVENTION_COLOR_MAP[currentIntervention],
+                  borderRadius: '9999px',
+                  border: '4px solid white',
+                }}
+              >
+                &nbsp;
+              </div>
+            </div>
+            <div
+              style={{
+                paddingLeft: '16px',
+                color: '#4d4d4d',
+              }}
+            >
+              {currentIntervention}
             </div>
           </div>
-          <div
-            style={{
-              paddingLeft: '16px',
-              color: '#4d4d4d',
-            }}
-          >
-            {currentIntervention}
-          </div>
-        </div>
-      </Content>
+        </Content>
+      </div>
     </div>
   );
 };
