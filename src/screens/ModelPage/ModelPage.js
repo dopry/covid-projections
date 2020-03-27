@@ -11,7 +11,10 @@ import CountySelector from 'components/MapSelectors/CountySelector';
 import {
   Wrapper,
   Content,
+<<<<<<< HEAD
   ChartHeader,
+=======
+>>>>>>> 9d6be5437702f08d8297323aeb50c92c499fb55e
   ModelViewOption,
   ModelViewToggle,
   CountySelectorWrapper,
