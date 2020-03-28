@@ -7,6 +7,14 @@ import {
   WarnSocialDistancing,
   CheckShelterInPlace,
 } from 'assets/images/capacityIcons';
+import InterventionIcon from 'assets/images/interventionIcon';
+import {
+  CallToActionBox,
+  Section,
+  Content,
+  Title,
+  Icon,
+} from './CallToAction.style';
 
 const DAYS = 1000 * 60 * 60 * 24;
 const ONE_HUNDRED_DAYS = 100 * DAYS;
@@ -48,111 +56,27 @@ const CallToAction = ({ interventions, currentIntervention }) => {
         <WarnSocialDistancing />
       );
   }
-
-  const Title = ({ children }) => {
-    return (
-      <div
-        style={{
-          background: '#f2f2f2',
-          padding: '16px',
-          color: '#494949',
-          fontWeight: 'bold',
-        }}
-      >
-        {children}
-      </div>
-    );
-  };
-  const Content = ({ children }) => {
-    return (
-      <div
-        style={{
-          padding: '16px',
-        }}
-      >
-        {children}
-      </div>
-    );
-  };
+  interventionIcon = (
+    <InterventionIcon color={INTERVENTION_COLOR_MAP[currentIntervention]} />
+  );
 
   return (
-    <div
-      style={{
-        marginTop: '2rem',
-        border: '1px solid #d5d5d5',
-        borderRadius: '4px',
-        borderSizing: 'border-box',
-        overflow: 'hidden',
-        display: 'flex',
-      }}
-    >
-      <div
-        style={{
-          borderRight: `1px solid #d5d5d5`,
-          width: '50%',
-        }}
-      >
-        <Title>Hospital capacity</Title>
-        <Content>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <div>{capacityIcon}</div>
-            <div
-              style={{
-                paddingLeft: '16px',
-                color: '#4d4d4d',
-              }}
-            >
-              {shortActionText}
-            </div>
-          </div>
-        </Content>
-      </div>
-      <div style={{ width: '50%' }}>
+    <CallToActionBox>
+      <Section>
         <Title>Current Intervention style</Title>
         <Content>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <div
-              style={{
-                borderRadius: '9999px',
-                border: '2px solid #4d4d4d',
-              }}
-            >
-              <div
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  background: INTERVENTION_COLOR_MAP[currentIntervention],
-                  borderRadius: '9999px',
-                  border: '4px solid white',
-                }}
-              >
-                &nbsp;
-              </div>
-            </div>
-            <div
-              style={{
-                paddingLeft: '16px',
-                color: '#4d4d4d',
-              }}
-            >
-              {currentIntervention}
-            </div>
-          </div>
+          <Icon>{interventionIcon}</Icon>
+          {currentIntervention}
         </Content>
-      </div>
-    </div>
+      </Section>
+      <Section>
+        <Title>Hospital capacity</Title>
+        <Content>
+          <Icon>{capacityIcon}</Icon>
+          {shortActionText}
+        </Content>
+      </Section>
+    </CallToActionBox>
   );
 };
 
