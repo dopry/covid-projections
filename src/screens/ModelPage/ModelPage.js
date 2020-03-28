@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Redirect, useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
+import US_STATE_DATASET from 'components/MapSelectors/datasets/us_states_dataset_01_02_2020';
 // import CountyMap from 'components/CountyMap/CountyMap';
 import Outcomes from './Outcomes/Outcomes';
 import ShareModelBlock from './ShareModelBlock/ShareModelBlock';
@@ -11,7 +12,6 @@ import CountySelector from 'components/MapSelectors/CountySelector';
 import {
   Wrapper,
   Content,
-  ChartHeader,
   ModelViewOption,
   ModelViewToggle,
   CountySelectorWrapper,
@@ -22,9 +22,9 @@ import {
   STATE_TO_INTERVENTION,
   INTERVENTION_COLOR_MAP,
   INTERVENTIONS,
-  SHELTER_IN_PLACE_WORST_CASE_COLOR,
 } from 'enums';
 import { useModelDatas, Model } from 'utils/model';
+import _ from 'lodash';
 
 const limitedActionColor = INTERVENTION_COLOR_MAP[INTERVENTIONS.LIMITED_ACTION];
 const socialDistancingColor =
@@ -36,9 +36,16 @@ const shelterInPlaceWorseCaseColor =
   INTERVENTION_COLOR_MAP[INTERVENTIONS.SHELTER_IN_PLACE_WORST_CASE];
 
 function ModelPage() {
-  const { id: location, countyId: countyId } = useParams();
-  const [countyView, setCountyView] = useState(false);
-  const [selectedCounty, setSelectedCounty] = useState(null);
+  const { id: location, countyId } = useParams();
+  const [countyView, setCountyView] = useState(countyId ? true : false);
+  let countyOption = null;
+  if (countyId) {
+    countyOption = _.find(
+      US_STATE_DATASET.state_county_map_dataset[location].county_dataset,
+      ['county_url_name', countyId],
+    );
+  }
+  const [selectedCounty, setSelectedCounty] = useState(countyOption);
   const [redirectTarget, setRedirectTarget] = useState();
   const history = useHistory();
 
@@ -125,7 +132,7 @@ function ModelPage() {
                 selectedCounty={selectedCounty}
                 handleChange={option => {
                   setRedirectTarget(
-                    `/state/${location}/county/${option.county}`,
+                    `/state/${location}/county/${option.county_url_name}`,
                   );
                   setSelectedCounty(option);
                 }}
@@ -208,13 +215,13 @@ function ModelPage() {
               </li>
             </ul>
           </Content>
+          <Content>
+            <div style={{ marginTop: '3rem' }}>
+              <Newsletter />
+            </div>
+          </Content>
         </Panel>
       )}
-      <Content>
-        <div style={{ marginTop: '3rem' }}>
-          <Newsletter />
-        </div>
-      </Content>
     </Wrapper>
   );
 }

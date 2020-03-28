@@ -31,7 +31,7 @@ const Chart = ({
     model = interventionToModel[INTERVENTIONS.SOCIAL_DISTANCING];
   }
 
-  const hospitalsOverloadedPlotLineText = (currentIntervention) => {
+  const hospitalsOverloadedPlotLineText = currentIntervention => {
     let plotLineText;
     switch (currentIntervention) {
       case INTERVENTIONS.SHELTER_IN_PLACE:
@@ -145,13 +145,21 @@ const Chart = ({
       plotLines: [
         {
           value: model.dateOverwhelmed,
-          className: snakeCase(currentIntervention === INTERVENTIONS.SHELTER_IN_PLACE ? INTERVENTIONS.SHELTER_IN_PLACE_WORST_CASE : currentIntervention),
+          className: snakeCase(
+            currentIntervention === INTERVENTIONS.SHELTER_IN_PLACE
+              ? INTERVENTIONS.SHELTER_IN_PLACE_WORST_CASE
+              : currentIntervention,
+          ),
           zIndex: 10,
           label: {
             formatter: function () {
               return `<div class="custom-plot-label custom-plot-label-${snakeCase(
-                currentIntervention === INTERVENTIONS.SHELTER_IN_PLACE ? INTERVENTIONS.SHELTER_IN_PLACE_WORST_CASE : currentIntervention ,
-              )}">Hospitals Overloaded<div>${hospitalsOverloadedPlotLineText(currentIntervention)}</div></div>`;
+                currentIntervention === INTERVENTIONS.SHELTER_IN_PLACE
+                  ? INTERVENTIONS.SHELTER_IN_PLACE_WORST_CASE
+                  : currentIntervention,
+              )}">Hospitals Overloaded<div>${hospitalsOverloadedPlotLineText(
+                currentIntervention,
+              )}</div></div>`;
             },
             rotation: 0,
             useHTML: true,
