@@ -29,13 +29,17 @@ const CallToAction = ({ interventions, currentIntervention }) => {
 
   const model = interventionToModel[currentIntervention];
 
-  let actionText, shortActionText, capacityIcon, actionDateRange;
+  let actionText,
+    shortActionText,
+    capacityIcon,
+    interventionIcon,
+    actionDateRange;
   if (
     !model.dateOverwhelmed ||
     model.dateOverwhelmed - new Date() > ONE_HUNDRED_DAYS
   ) {
     actionText = `${currentIntervention} projected to successfully delay hospital overload by greater than 3 months.`;
-    shortActionText = `No overload projected`;
+    shortActionText = `Reduced overload projected over the next 3 months`;
     capacityIcon = <CheckShelterInPlace />;
   } else {
     actionText = `To prevent hospital overload, ${suggestedIntervention()} must be implemented by:`;
@@ -48,7 +52,7 @@ const CallToAction = ({ interventions, currentIntervention }) => {
     );
     shortActionText = `Overload projected between ${formatDate(
       earlyDate,
-    )} to ${formatDate(lateDate)}`;
+    )} and ${formatDate(lateDate)}`;
     capacityIcon =
       currentIntervention === INTERVENTIONS.LIMITED_ACTION ? (
         <WarnLimitedAction />
