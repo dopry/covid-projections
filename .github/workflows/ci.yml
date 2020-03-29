@@ -38,3 +38,65 @@ jobs:
         with:
           name: code-coverage-report
           path: coverage
+  
+  build:
+      name: Build
+      needs: test
+      runs-on: ubuntu-18.04
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - uses: actions/setup-node@v1.1.0
+        with:
+          node-version: '10.x'
+    
+      - name: Cache Node Modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+          
+      - name: Cache Cypress
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/Cypress # npm cache files are stored in `~/.npm` on Linux/macOS
+          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-cypress-
+
+      - run: npm ci
+      - run: npm run build
+      
+      - name: Archive production build
+        uses: actions/upload-artifact@v1
+        with:
+          name: build
+          path: build
+      
+  deploy: 
+      name: Deploy
+      needs: build
+      runs-on: ubuntu-18.04
+      # Deploys are disabled until we can get the team to review this approach will work. 
+      if: true == false && github.ref == 'refs/heads/master' || 'refs/heads/develop'
+      steps:
+      - name: Download build
+        uses: actions/download-artifact@v1
+        with:
+          name: build
+      - name: Set env to staging
+        if: github.ref == 'refs/heads/develop'
+        run: echo "::set-env name=AWS_S3_BUCKET::staging.covidactnow.org"
+      - name: Set env to production
+        if: github.ref == 'refs/heads/master'
+        run: echo "::set-env name=AWS_S3_BUCKET::covidactnow.org"
+      - uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-west-1'   # optional: defaults to us-east-1
+          SOURCE_DIR: 'build/'      # optional: defaults to entire repository
+     
